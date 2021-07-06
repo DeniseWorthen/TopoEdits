@@ -20,7 +20,7 @@ optall = $(opt1) $(opt2)
 ######################################################################
 #
 #####################################################################
-OBJS = param.o charstrings.o grdvars.o maskdefs.o topoedits.o write_mskgrid.o
+OBJS = param.o charstrings.o grdvars.o maskdefs.o adjust_landmask.o topoedits.o write_mskgrid.o
 
 topoed: $(OBJS)
 	$(F90) $(FOPT) -o topoed $(OBJS) -L$(CDF)/lib -lnetcdff -lnetcdf

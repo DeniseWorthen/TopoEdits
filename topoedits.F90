@@ -6,9 +6,8 @@ program topoedits
   use netcdf
   use param
   use grdvars
+  use adjust_landmask
   use charstrings
-
-  use maskdefs, only : mval4, mval8
 
   implicit none
 
@@ -16,7 +15,9 @@ program topoedits
 
   integer :: rc,ncid,id,xtype
   integer :: i,j,i2,j2,im1,ip1
-  integer :: ii,jj,k
+  integer :: ii,jj,k,nt
+
+  real(kind=4), dimension(ni,nj) :: tmp
 
 !---------------------------------------------------------------------
 ! read the land mask
@@ -91,25 +92,52 @@ program topoedits
   end do
 
 !---------------------------------------------------------------------
+! adjust land mask at j=1 and for ocean pts w/ less than 2 active
+! neighbors N/S of 60deg
+!---------------------------------------------------------------------
+
+       tmp = wet4
+  tmp(:,1) = 0.0
+
+   call singlepts(tmp, xwet)
+  
+!---------------------------------------------------------------------
 ! find the initial pinch points
 !---------------------------------------------------------------------
 
    kmtii = 0.0; kmtjj = 0.0
    do j = 2,nj-1
     do i = 1,ni
-    if ((wet4(i,j) .eq. 1.0) .and. &
+    if ((xwet(i,j) .eq. 1.0) .and. &
          (abs(latCt(i,j)) .ge. 60.0)) then
                   im1 = i-1
      if(i .eq.  1)im1 = ni
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     kmtii(i,j) = wet4(im1,j) + wet4(ip1,j)
-     kmtjj(i,j) = wet4(i,j-1) + wet4(i,j+1)
+     if(xwet(im1,j) .eq. 0.0 .and. xwet(ip1,j) .eq. 0.0)kmtii(i,j) = 1.0
+     if(xwet(i,j-1) .eq. 0.0 .and. xwet(i,j+1) .eq. 0.0)kmtjj(i,j) = 1.0
     end if
    end do
   end do
 
+!---------------------------------------------------------------------
+! for kmtii pinches, preferentially remove land at i-1
+! for kmtjj pinches, preferentially remove land at j-1
+!---------------------------------------------------------------------
+
+   do j = 1,nj
+    do i = 2,ni
+     if (kmtii(i,j) .eq. 1.0) xwet(i-1,j) = 1.0
+    enddo
+   enddo
+
+   do j = 2,nj
+    do i = 1,ni
+     if (kmtjj(i,j) .eq. 1.0) xwet(i,j-1) = 1.0
+    enddo
+   enddo
+ 
 !---------------------------------------------------------------------
 ! kludgy fix: 1-deg model has single point which switches froma
 ! land->ocean at run time. see issue #47 on NOAA-EMC/MOM6
@@ -117,13 +145,6 @@ program topoedits
 
 !   ii = 88; jj = 132
 !   if(wet4(ii+1,jj+1) .eq. 0.0)wet4(ii+1,jj+1) = 1.0
-
-!---------------------------------------------------------------------
-! adjust land mask at j=1 and for ocean pts w/ less than 2 active
-! neighbors S of 60S
-!---------------------------------------------------------------------
-
-!   call adjust_landmask
 
 !---------------------------------------------------------------------
 ! write out grid file files

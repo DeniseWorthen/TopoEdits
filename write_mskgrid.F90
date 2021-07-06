@@ -21,7 +21,7 @@ subroutine write_mskgrid
   call msk_typedefine
 
   !fname_out= trim(dirout)//'mask.'//trim(res)//'.nc'
-  fname_out= 'mask.'//trim(res)//'.nc'
+  fname_out= 'mask.mx'//trim(res)//'.nc'
 
   rc = nf90_create(fname_out, nf90_write, ncid)
   print *, 'writing masks to ',trim(fname_out)
@@ -42,11 +42,7 @@ subroutine write_mskgrid
    if(trim(mskgrid(ii)%var_type) .eq. 'i4')rc = nf90_def_var(ncid, &
                   trim(mskgrid(ii)%var_name), nf90_int,    vardim, id)
    rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
-   !print *, trim(nf90_strerror(rc))
    rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
-   !print *, trim(nf90_strerror(rc))
-   !rc = nf90_put_att(ncid, id, '_FillValue', mskgrid(ii)%var_mval)
-   !print *, trim(nf90_strerror(rc))
    end if
   enddo
    rc = nf90_enddef(ncid)
@@ -54,11 +50,9 @@ subroutine write_mskgrid
 
   rc = nf90_inq_varid(ncid,  'tlon',      id)
   rc = nf90_put_var(ncid,        id,   lonCt)
-   print *, 'tlon ',trim(nf90_strerror(rc))
 
   rc = nf90_inq_varid(ncid,  'tlat',      id)
   rc = nf90_put_var(ncid,        id,   latCt)
-   print *, 'tlat ',trim(nf90_strerror(rc))
 
   rc = nf90_inq_varid(ncid,   'wet',      id)
   rc = nf90_put_var(ncid,        id,    wet4)
@@ -72,6 +66,8 @@ subroutine write_mskgrid
   rc = nf90_inq_varid(ncid,  'kmtjj',     id)
   rc = nf90_put_var(ncid,         id,  kmtjj)
 
+  rc = nf90_inq_varid(ncid,   'xwet',     id)
+  rc = nf90_put_var(ncid,         id,   xwet)
   rc = nf90_close(ncid)
 
 end subroutine write_mskgrid
