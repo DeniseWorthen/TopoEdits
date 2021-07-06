@@ -11,8 +11,30 @@ subroutine write_mskgrid
   ! local variables
 
   character(len=256) :: fname_out, fname_in
-  integer :: ii,id,rc, ncid, dim2(2), dim3(3)
+  integer :: ii,id,rc, ncid, dim1(1), dim2(2), dim3(3)
   integer :: ni_dim,nj_dim,nk_dim
+  integer :: i,j
+
+   real(kind=4), dimension(ni) :: xtpos, xupos
+   real(kind=4), dimension(nj) :: ytpos, yupos
+
+!--------------------------------------------------------------------
+!c set up integer grid positions of T,U,V grids
+!c--------------------------------------------------------------------
+
+    xtpos(1) = 0.5
+    xupos(1) = 0.0
+   do i = 2,ni
+    xtpos(i) = xtpos(i-1) + 1.0
+    xupos(i) = xupos(i-1) + 1.0
+   enddo
+
+    ytpos(1) = 0.5
+    yupos(1) = 0.0
+   do j = 2,nj
+    ytpos(j) = ytpos(j-1) + 1.0
+    yupos(j) = yupos(j-1) + 1.0
+   enddo
 
 !---------------------------------------------------------------------
 ! local variables
@@ -64,7 +86,24 @@ subroutine write_mskgrid
    end if
   enddo
 
-   rc = nf90_enddef(ncid)
+  ! axes
+  dim1(1) = ni_dim
+  rc = nf90_def_var(ncid,     'Xt', nf90_float, dim1, id)
+  rc = nf90_def_var(ncid,     'Xu', nf90_float, dim1, id)
+  dim1(1) = nj_dim
+  rc = nf90_def_var(ncid,     'Yt', nf90_float, dim1, id)
+  rc = nf90_def_var(ncid,     'Yu', nf90_float, dim1, id)
+
+  rc = nf90_enddef(ncid)
+
+  rc = nf90_inq_varid(ncid, 'Xt', id)
+  rc = nf90_put_var(ncid, id, xtpos)
+  rc = nf90_inq_varid(ncid, 'Xu', id)
+  rc = nf90_put_var(ncid, id, xupos)
+  rc = nf90_inq_varid(ncid, 'Yt', id)
+  rc = nf90_put_var(ncid, id, ytpos)
+  rc = nf90_inq_varid(ncid, 'Yu', id)
+  rc = nf90_put_var(ncid, id, yupos)
 
   rc = nf90_inq_varid(ncid,  'tlon',      id)
   rc = nf90_put_var(ncid,        id,   lonCt)
