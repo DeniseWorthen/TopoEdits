@@ -11,8 +11,8 @@ subroutine write_mskgrid
   ! local variables
 
   character(len=256) :: fname_out, fname_in
-  integer :: ii,id,rc, ncid, vardim(2)
-  integer :: ni_dim,nj_dim
+  integer :: ii,id,rc, ncid, dim2(2), dim3(3)
+  integer :: ni_dim,nj_dim,nk_dim
 
 !---------------------------------------------------------------------
 ! local variables
@@ -27,26 +27,44 @@ subroutine write_mskgrid
   print *, 'writing masks to ',trim(fname_out)
   print *, 'nf90_create = ',trim(nf90_strerror(rc))
 
-  rc = nf90_def_dim(ncid,'ni', ni, ni_dim)
-  rc = nf90_def_dim(ncid,'nj', nj, nj_dim)
+  rc = nf90_def_dim(ncid, 'ni',     ni, ni_dim)
+  rc = nf90_def_dim(ncid, 'nj',     nj, nj_dim)
+  rc = nf90_def_dim(ncid, 'nk', nsteps, nk_dim)
 
-  vardim(2) = nj_dim
-  vardim(1) = ni_dim
-  do ii = 1,nmskvars
+  dim2(2) = nj_dim
+  dim2(1) = ni_dim
+  do ii = 1,4
    if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
    print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
    if(trim(mskgrid(ii)%var_type) .eq. 'r8')rc = nf90_def_var(ncid, &
-                  trim(mskgrid(ii)%var_name), nf90_double, vardim, id)
+                  trim(mskgrid(ii)%var_name), nf90_double, dim2, id)
    if(trim(mskgrid(ii)%var_type) .eq. 'r4')rc = nf90_def_var(ncid, &
-                  trim(mskgrid(ii)%var_name), nf90_float, vardim, id)
+                  trim(mskgrid(ii)%var_name), nf90_float, dim2, id)
    if(trim(mskgrid(ii)%var_type) .eq. 'i4')rc = nf90_def_var(ncid, &
-                  trim(mskgrid(ii)%var_name), nf90_int,    vardim, id)
+                  trim(mskgrid(ii)%var_name), nf90_int,    dim2, id)
    rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
    rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
    end if
   enddo
+
+  dim3(3) = nk_dim
+  dim3(2) = nj_dim
+  dim3(1) = ni_dim
+  do ii = 5,nmskvars
+   if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
+   print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
+   if(trim(mskgrid(ii)%var_type) .eq. 'r8')rc = nf90_def_var(ncid, &
+                  trim(mskgrid(ii)%var_name), nf90_double, dim3, id)
+   if(trim(mskgrid(ii)%var_type) .eq. 'r4')rc = nf90_def_var(ncid, &
+                  trim(mskgrid(ii)%var_name), nf90_float, dim3, id)
+   if(trim(mskgrid(ii)%var_type) .eq. 'i4')rc = nf90_def_var(ncid, &
+                  trim(mskgrid(ii)%var_name), nf90_int,    dim3, id)
+   rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
+   rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
+   end if
+  enddo
+
    rc = nf90_enddef(ncid)
-   print *, trim(nf90_strerror(rc))
 
   rc = nf90_inq_varid(ncid,  'tlon',      id)
   rc = nf90_put_var(ncid,        id,   lonCt)
@@ -62,12 +80,13 @@ subroutine write_mskgrid
  
   rc = nf90_inq_varid(ncid,  'kmtii',     id)
   rc = nf90_put_var(ncid,         id,  kmtii)
- 
+
   rc = nf90_inq_varid(ncid,  'kmtjj',     id)
   rc = nf90_put_var(ncid,         id,  kmtjj)
 
   rc = nf90_inq_varid(ncid,   'xwet',     id)
   rc = nf90_put_var(ncid,         id,   xwet)
+
   rc = nf90_close(ncid)
 
 end subroutine write_mskgrid

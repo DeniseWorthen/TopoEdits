@@ -16,8 +16,7 @@ program topoedits
   integer :: rc,ncid,id,xtype
   integer :: i,j,i2,j2,im1,ip1
   integer :: ii,jj,k,nt
-
-  real(kind=4), dimension(ni,nj) :: tmp
+  integer :: cnt
 
 !---------------------------------------------------------------------
 ! read the land mask
@@ -96,11 +95,23 @@ program topoedits
 ! neighbors N/S of 60deg
 !---------------------------------------------------------------------
 
-       tmp = wet4
-  tmp(:,1) = 0.0
+    xwet(:,:,1) =  wet4(:,:)
+    xwet(:,1,1) = 0.0
 
-   call singlepts(tmp, xwet)
-  
+    cnt = 0
+    do j = 2,nj-1
+     do i = 1,ni
+      if ((wet4(i,j) .eq. 1.0) .and. &
+           (abs(latCt(i,j)) .ge. 60.0)) then
+        if(kmtsum(i,j) .le. 1.0)then
+         cnt = cnt + 1
+         xwet(i,j,1) = 0.0
+        endif
+      endif
+     enddo
+    enddo
+    print *,' number of single points ',cnt
+
 !---------------------------------------------------------------------
 ! find the initial pinch points
 !---------------------------------------------------------------------
@@ -108,15 +119,15 @@ program topoedits
    kmtii = 0.0; kmtjj = 0.0
    do j = 2,nj-1
     do i = 1,ni
-    if ((xwet(i,j) .eq. 1.0) .and. &
+    if ((xwet(i,j,1) .eq. 1.0) .and. &
          (abs(latCt(i,j)) .ge. 60.0)) then
                   im1 = i-1
      if(i .eq.  1)im1 = ni
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     if(xwet(im1,j) .eq. 0.0 .and. xwet(ip1,j) .eq. 0.0)kmtii(i,j) = 1.0
-     if(xwet(i,j-1) .eq. 0.0 .and. xwet(i,j+1) .eq. 0.0)kmtjj(i,j) = 1.0
+     if(xwet(im1,j,1) .eq. 0.0 .and. xwet(ip1,j,1) .eq. 0.0)kmtii(i,j,1) = 1.0
+     if(xwet(i,j-1,1) .eq. 0.0 .and. xwet(i,j+1,1) .eq. 0.0)kmtjj(i,j,1) = 1.0
     end if
    end do
   end do
@@ -126,18 +137,74 @@ program topoedits
 ! for kmtjj pinches, preferentially remove land at j-1
 !---------------------------------------------------------------------
 
+   xwet(:,:,2) = xwet(:,:,1)
    do j = 1,nj
     do i = 2,ni
-     if (kmtii(i,j) .eq. 1.0) xwet(i-1,j) = 1.0
+     if (kmtii(i,j,1) .eq. 1.0) xwet(i-1,j,2) = 1.0
     enddo
    enddo
 
    do j = 2,nj
     do i = 1,ni
-     if (kmtjj(i,j) .eq. 1.0) xwet(i,j-1) = 1.0
+     if (kmtjj(i,j,1) .eq. 1.0) xwet(i,j-1,2) = 1.0
     enddo
    enddo
- 
+
+!---------------------------------------------------------------------
+! check for pinch points
+!---------------------------------------------------------------------
+
+   do j = 2,nj-1
+    do i = 1,ni
+    if ((xwet(i,j,2) .eq. 1.0) .and. &
+         (abs(latCt(i,j)) .ge. 60.0)) then
+                  im1 = i-1
+     if(i .eq.  1)im1 = ni
+                  ip1 = i+1
+     if(i .eq. ni)ip1 = 1
+
+     if(xwet(im1,j,2) .eq. 0.0 .and. xwet(ip1,j,2) .eq. 0.0)kmtii(i,j,2) = 1.0
+     if(xwet(i,j-1,2) .eq. 0.0 .and. xwet(i,j+1,2) .eq. 0.0)kmtjj(i,j,2) = 1.0
+    end if
+   end do
+  end do
+
+!---------------------------------------------------------------------
+! for kmtii pinches, preferentially remove land at i-1
+! for kmtjj pinches, preferentially remove land at j-1
+!---------------------------------------------------------------------
+
+   xwet(:,:,3) = xwet(:,:,2)
+   do j = 1,nj
+    do i = 2,ni
+     if (kmtii(i,j,2) .eq. 1.0) xwet(i-1,j,3) = 1.0
+    enddo
+   enddo
+
+   do j = 2,nj
+    do i = 1,ni
+     if (kmtjj(i,j,2) .eq. 1.0) xwet(i,j-1,3) = 1.0
+    enddo
+   enddo
+
+!---------------------------------------------------------------------
+! report remaining pinch points or isolated ocean
+!---------------------------------------------------------------------
+
+   do j = 2,nj-1
+    do i = 1,ni
+    if ((xwet(i,j,3) .eq. 1.0) .and. &
+         (abs(latCt(i,j)) .ge. 60.0)) then
+                  im1 = i-1
+     if(i .eq.  1)im1 = ni
+                  ip1 = i+1
+     if(i .eq. ni)ip1 = 1
+
+     if(xwet(im1,j,3) .eq. 0.0 .and. xwet(ip1,j,3) .eq. 0.0)print *,'im1,ip1 pinch at ',i,j
+     if(xwet(i,j-1,3) .eq. 0.0 .and. xwet(i,j+1,3) .eq. 0.0)print *,'jm1,jp1 pinch at ',i,j
+    end if
+   end do
+  end do
 !---------------------------------------------------------------------
 ! kludgy fix: 1-deg model has single point which switches froma
 ! land->ocean at run time. see issue #47 on NOAA-EMC/MOM6

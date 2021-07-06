@@ -10,11 +10,13 @@ module grdvars
   ! ocean mask from fixed file, stored as either r4 or r8
      real(kind=4), dimension(ni,nj) :: wet4
      real(kind=8), dimension(ni,nj) :: wet8
-     real(kind=4), dimension(ni,nj) :: xwet
 
      real(kind=4), dimension(ni,nj) :: kmtsum
-     real(kind=4), dimension(ni,nj) :: kmtii
-     real(kind=4), dimension(ni,nj) :: kmtjj
+
+  ! intermediate masks
+     real(kind=4), dimension(ni,nj,nsteps) :: xwet
+     real(kind=4), dimension(ni,nj,nsteps) :: kmtii
+     real(kind=4), dimension(ni,nj,nsteps) :: kmtjj
 
   ! ocn grid variables
   real(kind=8), dimension(ni,nj) :: lonCt, latCt

@@ -10,9 +10,9 @@ FOPT = -C -O0 -fPIC
 F90 = ifort
 
 #opt1 = -Doutput_grid_qdeg
-#opt1 = -Doutput_grid_hdeg
+opt1 = -Doutput_grid_hdeg
 #opt1 = -Doutput_grid_072deg
-opt1 = -Doutput_grid_1deg
+#opt1 = -Doutput_grid_1deg
 #opt1 = -Doutput_grid_3deg
 #opt1 = -Doutput_grid_twelfdeg
 
