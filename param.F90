@@ -24,6 +24,6 @@ module param
   integer, parameter :: nx  = ni*2, ny  = nj*2
 
   ! number of adjustment steps
-  integer, parameter :: nsteps = 3
+  integer, parameter :: nsteps = 10
 
 end module param

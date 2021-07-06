@@ -9,8 +9,8 @@ FOPT = -C -O0 -fPIC
 
 F90 = ifort
 
-#opt1 = -Doutput_grid_qdeg
-opt1 = -Doutput_grid_hdeg
+opt1 = -Doutput_grid_qdeg
+#opt1 = -Doutput_grid_hdeg
 #opt1 = -Doutput_grid_072deg
 #opt1 = -Doutput_grid_1deg
 #opt1 = -Doutput_grid_3deg
@@ -20,7 +20,7 @@ optall = $(opt1) $(opt2)
 ######################################################################
 #
 #####################################################################
-OBJS = param.o charstrings.o grdvars.o maskdefs.o adjust_landmask.o topoedits.o write_mskgrid.o
+OBJS = param.o charstrings.o grdvars.o maskdefs.o pinchpoints.o topoedits.o write_mskgrid.o
 
 topoed: $(OBJS)
 	$(F90) $(FOPT) -o topoed $(OBJS) -L$(CDF)/lib -lnetcdff -lnetcdf

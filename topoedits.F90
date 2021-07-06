@@ -6,7 +6,7 @@ program topoedits
   use netcdf
   use param
   use grdvars
-  use adjust_landmask
+  use pinchpoints
   use charstrings
 
   implicit none
@@ -112,11 +112,19 @@ program topoedits
     enddo
     print *,' number of single points ',cnt
 
+! eliminate channels
+
+   kmtii = 0.0; kmtjj = 0.0
+   do nt = 2,nsteps
+    call fixchannels(nt)
+ 
+    call singlepoints(nt)
+   end do
+#ifdef test
 !---------------------------------------------------------------------
 ! find the initial pinch points
 !---------------------------------------------------------------------
 
-   kmtii = 0.0; kmtjj = 0.0
    do j = 2,nj-1
     do i = 1,ni
     if ((xwet(i,j,1) .eq. 1.0) .and. &
@@ -205,6 +213,7 @@ program topoedits
     end if
    end do
   end do
+#endif
 !---------------------------------------------------------------------
 ! kludgy fix: 1-deg model has single point which switches froma
 ! land->ocean at run time. see issue #47 on NOAA-EMC/MOM6
