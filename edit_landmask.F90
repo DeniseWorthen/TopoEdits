@@ -61,8 +61,13 @@ module edit_landmask
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)kmtii(i,j,nt) = 1.0
-     if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)kmtjj(i,j,nt) = 1.0
+     if(xwet(i,j+1,nt) .eq. 1.0 .or. xwet(i,j-1,nt) .eq. 1.0)then   !n/s channel
+      if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)kmtii(i,j,nt) = 1.0
+     end if
+
+     if(xwet(im1,j,nt) .eq. 1.0 .or. xwet(ip1,j,nt) .eq. 1.0)then   !e/w channel
+      if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)kmtjj(i,j,nt) = 1.0
+     end if
     end if
    end do
   end do
@@ -72,15 +77,17 @@ module edit_landmask
 ! for kmtjj pinches, preferentially remove land at j-1
 !---------------------------------------------------------------------
 
-   do j = 1,nj
-    do i = 2,ni
+   do j = 2,nj-1
+    do i = 2,ni-1
      if (kmtii(i,j,nt) .eq. 1.0) xwet(i-1,j,nt) = 1.0
+     !if (kmtii(i,j,nt) .eq. 1.0) xwet(i+1,j,nt) = 1.0
     enddo
    enddo
 
-   do j = 2,nj
-    do i = 1,ni
+   do j = 2,nj-1
+    do i = 2,ni-1
      if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j-1,nt) = 1.0
+     !if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j+1,nt) = 1.0
     enddo
    enddo
 
