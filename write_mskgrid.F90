@@ -87,6 +87,9 @@ subroutine write_mskgrid
   rc = nf90_inq_varid(ncid,   'xwet',     id)
   rc = nf90_put_var(ncid,         id,   xwet)
 
+  rc = nf90_inq_varid(ncid,    'uvm',     id)
+  rc = nf90_put_var(ncid,         id,    uvm)
+
   rc = nf90_close(ncid)
 
 end subroutine write_mskgrid

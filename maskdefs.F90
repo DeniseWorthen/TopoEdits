@@ -59,5 +59,10 @@ module maskdefs
    mskgrid(ii)%long_name = 'modified land mask'
    mskgrid(ii)%unit_name = 'nd'
 
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'uvm'
+   mskgrid(ii)%long_name = 'cice u-mask'
+   mskgrid(ii)%unit_name = 'nd'
+
  end subroutine msk_typedefine
 end module maskdefs

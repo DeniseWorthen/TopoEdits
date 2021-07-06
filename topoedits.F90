@@ -39,6 +39,14 @@ program topoedits
   print *,minval(wet8),maxval(wet8)
   print *,minval(wet4),maxval(wet4)
 
+  uvm = 0.0
+  do j = 1,nj-1
+   do i = 1,ni-1
+    uvm(i,j,1) = min (wet4(i,j  ), wet4(i+1,j  ), &
+                      wet4(i,j+1), wet4(i+1,j+1))
+   enddo
+  enddo
+
 !---------------------------------------------------------------------
 ! read supergrid file
 !---------------------------------------------------------------------
@@ -88,7 +96,17 @@ program topoedits
     call singlepoints(nt)
 ! eliminate channels
     call fixchannels(nt)
+
+! cice umask
+    do j = 1,nj-1
+     do i = 1,ni-1
+      uvm(i,j,nt) = min (xwet(i,j,  nt), xwet(i+1,j,  nt), &
+                         xwet(i,j+1,nt), xwet(i+1,j+1,nt))
+     enddo
+    enddo
+
    end do
+
 !---------------------------------------------------------------------
 ! kludgy fix: 1-deg model has single point which switches froma
 ! land->ocean at run time. see issue #47 on NOAA-EMC/MOM6

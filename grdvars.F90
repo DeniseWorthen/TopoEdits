@@ -16,8 +16,11 @@ module grdvars
      real(kind=4), dimension(ni,nj,nsteps) :: xwet
      real(kind=4), dimension(ni,nj,nsteps) :: kmtii
      real(kind=4), dimension(ni,nj,nsteps) :: kmtjj
+  ! cice 'uvm' mask
+     real(kind=4), dimension(ni,nj,nsteps) :: uvm
 
   ! ocn grid variables
   real(kind=8), dimension(ni,nj) :: lonCt, latCt
+
 
 end module grdvars
