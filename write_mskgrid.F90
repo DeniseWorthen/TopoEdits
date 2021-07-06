@@ -49,8 +49,8 @@ subroutine write_mskgrid
   print *, 'writing masks to ',trim(fname_out)
   print *, 'nf90_create = ',trim(nf90_strerror(rc))
 
-  rc = nf90_def_dim(ncid, 'ni',     ni, ni_dim)
-  rc = nf90_def_dim(ncid, 'nj',     nj, nj_dim)
+  rc = nf90_def_dim(ncid, 'Xt',     ni, ni_dim)
+  rc = nf90_def_dim(ncid, 'Yt',     nj, nj_dim)
   rc = nf90_def_dim(ncid, 'nk', nsteps, nk_dim)
 
   dim2(2) = nj_dim
