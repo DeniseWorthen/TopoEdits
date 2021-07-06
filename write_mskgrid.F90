@@ -33,7 +33,7 @@ subroutine write_mskgrid
 
   dim2(2) = nj_dim
   dim2(1) = ni_dim
-  do ii = 1,4
+  do ii = 1,3
    if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
    print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
    if(trim(mskgrid(ii)%var_type) .eq. 'r8')rc = nf90_def_var(ncid, &
@@ -50,7 +50,7 @@ subroutine write_mskgrid
   dim3(3) = nk_dim
   dim3(2) = nj_dim
   dim3(1) = ni_dim
-  do ii = 5,nmskvars
+  do ii = 4,nmskvars
    if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
    print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
    if(trim(mskgrid(ii)%var_type) .eq. 'r8')rc = nf90_def_var(ncid, &

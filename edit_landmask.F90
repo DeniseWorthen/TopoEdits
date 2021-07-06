@@ -1,9 +1,48 @@
-module pinchpoints
+module edit_landmask
 
  use param
  use grdvars
 
  contains
+
+ subroutine singlepoints(nt)
+
+  integer, intent(in) :: nt
+  integer :: cnt
+ 
+!---------------------------------------------------------------------
+!
+!---------------------------------------------------------------------
+
+    do j = 2,nj-1
+     do i = 1,ni
+      if ((xwet(i,j,nt) .eq. 1.0) .and. &
+           (abs(latCt(i,j)) .ge. 60.0)) then
+                    im1 = i-1
+       if(i .eq.  1)im1 = ni
+                    ip1 = i+1
+       if(i .eq. ni)ip1 = 1
+
+       kmtsum(i,j,nt) = xwet(im1,j,nt) + xwet(ip1,j,nt) + xwet(i,j-1,nt) + xwet(i,j+1,nt)
+      end if
+     end do
+    end do
+
+    cnt = 0
+    do j = 2,nj-1
+     do i = 1,ni
+      if ((xwet(i,j,nt) .eq. 1.0) .and. &
+           (abs(latCt(i,j)) .ge. 60.0)) then
+        if(kmtsum(i,j,nt) .le. 1.0)then
+         cnt = cnt + 1
+         xwet(i,j,nt) = 0.0
+        endif
+      endif
+     enddo
+    enddo
+    print *,'iteration ',nt,' number of single points eliminated',cnt
+
+ end subroutine singlepoints
 
  subroutine fixchannels(nt)
 
@@ -15,15 +54,15 @@ module pinchpoints
 
    do j = 2,nj-1
     do i = 1,ni
-    if ((xwet(i,j,nt-1) .eq. 1.0) .and. &
+    if ((xwet(i,j,nt) .eq. 1.0) .and. &
          (abs(latCt(i,j)) .ge. 60.0)) then
                   im1 = i-1
      if(i .eq.  1)im1 = ni
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     if(xwet(im1,j,nt-1) .eq. 0.0 .and. xwet(ip1,j,nt-1) .eq. 0.0)kmtii(i,j,nt) = 1.0
-     if(xwet(i,j-1,nt-1) .eq. 0.0 .and. xwet(i,j+1,nt-1) .eq. 0.0)kmtjj(i,j,nt) = 1.0
+     if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)kmtii(i,j,nt) = 1.0
+     if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)kmtjj(i,j,nt) = 1.0
     end if
    end do
   end do
@@ -33,7 +72,6 @@ module pinchpoints
 ! for kmtjj pinches, preferentially remove land at j-1
 !---------------------------------------------------------------------
 
-   xwet(:,:,nt) = xwet(:,:,nt-1)
    do j = 1,nj
     do i = 2,ni
      if (kmtii(i,j,nt) .eq. 1.0) xwet(i-1,j,nt) = 1.0
@@ -47,7 +85,7 @@ module pinchpoints
    enddo
 
 !---------------------------------------------------------------------
-! report remaining pinch points or isolated ocean
+! report remaining pinch points
 !---------------------------------------------------------------------
 
    do j = 2,nj-1
@@ -67,46 +105,4 @@ module pinchpoints
 
  end subroutine fixchannels
 
- subroutine singlepoints(nt)
-
-  integer, intent(in) :: nt
-  integer :: cnt
- 
-  real, dimension(ni,nj) :: tmp
-
-!---------------------------------------------------------------------
-!
-!---------------------------------------------------------------------
-
-   tmp = 0.0
-  xwet(:,:,nt) = xwet(:,:,nt-1)
-  do j = 2,nj-1
-   do i = 1,ni
-    if ((xwet(i,j,nt) .eq. 1.0) .and. &
-         (abs(latCt(i,j)) .ge. 60.0)) then
-                  im1 = i-1
-     if(i .eq.  1)im1 = ni
-                  ip1 = i+1
-     if(i .eq. ni)ip1 = 1
-
-     tmp(i,j) = xwet(im1,j,nt-1) + xwet(ip1,j,nt-1) + xwet(i,j-1,nt-1) + xwet(i,j+1,nt-1)
-    end if
-   end do
-  end do
-
-    cnt = 0
-    do j = 2,nj-1
-     do i = 1,ni
-      if ((xwet(i,j,nt-1) .eq. 1.0) .and. &
-           (abs(latCt(i,j)) .ge. 60.0)) then
-        if(tmp(i,j) .le. 1.0)then
-         cnt = cnt + 1
-         xwet(i,j,nt) = 0.0
-        endif
-      endif
-     enddo
-    enddo
-    print *,' number of single points ',cnt
-
- end subroutine singlepoints
-end module pinchpoints
+end module edit_landmask

@@ -11,9 +11,8 @@ module grdvars
      real(kind=4), dimension(ni,nj) :: wet4
      real(kind=8), dimension(ni,nj) :: wet8
 
-     real(kind=4), dimension(ni,nj) :: kmtsum
-
   ! intermediate masks
+     real(kind=4), dimension(ni,nj,nsteps) :: kmtsum
      real(kind=4), dimension(ni,nj,nsteps) :: xwet
      real(kind=4), dimension(ni,nj,nsteps) :: kmtii
      real(kind=4), dimension(ni,nj,nsteps) :: kmtjj
