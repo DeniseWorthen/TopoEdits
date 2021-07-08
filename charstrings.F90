@@ -23,15 +23,18 @@ module charstrings
 
 #ifdef output_grid_qdeg
   character(len= 10) :: res = '025'
+  character(len=100) :: bathfile = 'ocean_topog'
 #endif
 #ifdef output_grid_hdeg
   character(len= 10) :: res = '050'
-#endif
-#ifdef output_grid_072deg
-  character(len= 10) :: res = '072'
+  character(len=100) :: bathfile = 'ocean_topog'
 #endif
 #ifdef output_grid_1deg
   character(len= 10) :: res = '100'
+  character(len=100) :: bathfile = 'topog'
+#endif
+#ifdef output_grid_072deg
+  character(len= 10) :: res = '072'
 #endif
 #ifdef output_grid_3deg
   character(len= 10) :: res = '300'
@@ -42,6 +45,7 @@ module charstrings
 
   character(len=100) :: maskfile = 'ocean_mask'
   character(len= 12) :: maskname = 'mask'
+  character(len= 12) :: bathname = 'depth'
 
   !character(len=256) :: dirout = '/scratch2/NCEPDEV/climate/Denise.Worthen/grids-20210223/'
   character(len=256) :: dirout = '/scratch2/NCEPDEV/climate/Denise.Worthen/GTMP/'

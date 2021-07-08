@@ -23,5 +23,8 @@ module grdvars
   real(kind=8), dimension(ni,nj) :: lonCt, latCt
   real(kind=8), dimension(ni,nj) :: lonBu, latBu
 
+  ! ocean bathy
+  real(kind=8), dimension(ni,nj) ::  depth   ! default depth
+  real(kind=8), dimension(ni,nj) :: xdepth   ! mask modified depth
 
 end module grdvars

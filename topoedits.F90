@@ -18,6 +18,9 @@ program topoedits
   integer :: ii,jj,k,nt
   integer :: cnt
 
+  real(kind=8) :: sum
+  real(kind=4), dimension(ni,nj) :: maskdiff
+
 !---------------------------------------------------------------------
 ! read the land mask
 !---------------------------------------------------------------------
@@ -46,6 +49,21 @@ program topoedits
                       wet4(i,j+1), wet4(i+1,j+1))
    enddo
   enddo
+
+!---------------------------------------------------------------------
+! read the bathymetry
+!---------------------------------------------------------------------
+
+  fname_in = trim(dirsrc)//trim(res)//'/'//trim(bathfile)//'.nc'
+
+  rc = nf90_open(fname_in, nf90_nowrite, ncid)
+  print *, 'reading ocean bathymetry from ',trim(fname_in)
+  print *, 'nf90_open = ',trim(nf90_strerror(rc))
+
+  rc = nf90_inq_varid(ncid,  trim(bathname), id)
+  rc = nf90_inquire_variable(ncid,     id)
+  rc = nf90_get_var(ncid,      id,  depth)
+  rc = nf90_close(ncid)
 
 !---------------------------------------------------------------------
 ! read supergrid file
@@ -108,6 +126,31 @@ program topoedits
      enddo
     enddo
 
+   end do
+
+!---------------------------------------------------------------------
+! adjust bathymetry
+!---------------------------------------------------------------------
+
+   xdepth = depth
+   maskdiff(:,:) = wet4(:,:) - xwet(:,:,nsteps)
+
+   ! where land is added, set xdepth to 0.0
+   where(maskdiff .gt. 0.0)xdepth = 0.0
+
+   ! where land is removed, use mean of surrounding points
+   do j = 2,nj-1
+    do i = 1,ni
+     if(maskdiff(i,j) .lt. 0.0)then
+                   im1 = i-1
+      if(i .eq.  1)im1 = ni
+                   ip1 = i+1
+      if(i .eq. ni)ip1 = 1
+
+      sum = depth(im1,j) + depth(ip1,j) + depth(i,j-1) + depth(i,j+1)
+      xdepth(i,j) = sum/4.0
+     end if
+    end do
    end do
 
 !---------------------------------------------------------------------

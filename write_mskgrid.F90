@@ -72,10 +72,10 @@ subroutine write_mskgrid
    rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
    end if
   enddo
-
+  
   dim2(2) = ytdim
   dim2(1) = xtdim
-  do ii = 3,5
+  do ii = 3,7
    if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
    print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
    vtype = trim(mskgrid(ii)%var_type)
@@ -91,7 +91,7 @@ subroutine write_mskgrid
   dim3(3) =  kdim
   dim3(2) = ytdim
   dim3(1) = xtdim
-  do ii = 6,nmskvars
+  do ii = 8,nmskvars
    if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
    print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
    vtype = trim(mskgrid(ii)%var_type)
@@ -142,10 +142,16 @@ subroutine write_mskgrid
   rc = nf90_inq_varid(ncid, 'latBu',      id)
   rc = nf90_put_var(ncid,        id,   latBu)
 
-  ! masks
   rc = nf90_inq_varid(ncid,   'wet',      id)
   rc = nf90_put_var(ncid,        id,    wet4)
 
+  rc = nf90_inq_varid(ncid, 'depth',      id)
+  rc = nf90_put_var(ncid,        id,   depth)
+
+  rc = nf90_inq_varid(ncid,'xdepth',      id)
+  rc = nf90_put_var(ncid,        id,  xdepth)
+
+  ! altered masks
   rc = nf90_inq_varid(ncid, 'kmtsum',      id)
   rc = nf90_put_var(ncid,         id,  kmtsum)
  

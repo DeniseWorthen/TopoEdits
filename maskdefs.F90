@@ -52,6 +52,18 @@ module maskdefs
    mskgrid(ii)%unit_name = 'nd'
 
    ii = ii + 1
+   mskgrid(ii)%var_name  = 'depth'
+   mskgrid(ii)%long_name = 'ocean bathymetry'
+   mskgrid(ii)%unit_name = 'm'
+   mskgrid(ii)%var_type  = 'r8'
+
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'xdepth'
+   mskgrid(ii)%long_name = 'modified ocean bathymetry'
+   mskgrid(ii)%unit_name = 'm'
+   mskgrid(ii)%var_type  = 'r8'
+
+   ii = ii + 1
    mskgrid(ii)%var_name  = 'kmtsum'
    mskgrid(ii)%long_name = '4point mask sum'
    mskgrid(ii)%unit_name = 'nd'
