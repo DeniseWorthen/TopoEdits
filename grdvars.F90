@@ -21,6 +21,7 @@ module grdvars
 
   ! ocn grid variables
   real(kind=8), dimension(ni,nj) :: lonCt, latCt
+  real(kind=8), dimension(ni,nj) :: lonBu, latBu
 
 
 end module grdvars

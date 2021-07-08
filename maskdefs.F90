@@ -7,7 +7,7 @@ module maskdefs
   type mskdefs
     character(len=12)   ::  var_name
     character(len=64)   :: long_name
-    character(len=12)   :: unit_name
+    character(len=14)   :: unit_name
     character(len= 2)   ::  var_type
   end type mskdefs
 
@@ -23,15 +23,27 @@ module maskdefs
    mskgrid(:)%var_type = 'r4'
 
    ii = ii + 1
-   mskgrid(ii)%var_name  = 'tlon'
-   mskgrid(ii)%long_name = 'Longitude of center (Ct) points'
-   mskgrid(ii)%unit_name = 'degrees'
+   mskgrid(ii)%var_name  = 'lonBu'
+   mskgrid(ii)%long_name = 'Longitude of corner (Bu) points'
+   mskgrid(ii)%unit_name = 'degrees_east'
    mskgrid(ii)%var_type  = 'r8'
 
    ii = ii + 1
-   mskgrid(ii)%var_name  = 'tlat'
+   mskgrid(ii)%var_name  = 'latBu'
+   mskgrid(ii)%long_name = 'Latitude of corner (Bu) points'
+   mskgrid(ii)%unit_name = 'degrees_north'
+   mskgrid(ii)%var_type  = 'r8'
+
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'lonCt'
+   mskgrid(ii)%long_name = 'Longitude of center (Ct) points'
+   mskgrid(ii)%unit_name = 'degrees_east'
+   mskgrid(ii)%var_type  = 'r8'
+
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'latCt'
    mskgrid(ii)%long_name = 'Latitude of center (Ct) points'
-   mskgrid(ii)%unit_name = 'degrees'
+   mskgrid(ii)%unit_name = 'degrees_north'
    mskgrid(ii)%var_type  = 'r8'
 
    ii = ii + 1

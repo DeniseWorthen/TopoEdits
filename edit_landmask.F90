@@ -80,14 +80,14 @@ module edit_landmask
    do j = 2,nj-1
     do i = 2,ni-1
      if (kmtii(i,j,nt) .eq. 1.0) xwet(i-1,j,nt) = 1.0
-     !if (kmtii(i,j,nt) .eq. 1.0) xwet(i+1,j,nt) = 1.0
+     if (kmtii(i,j,nt) .eq. 1.0) xwet(i+1,j,nt) = 1.0
     enddo
    enddo
 
    do j = 2,nj-1
     do i = 2,ni-1
      if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j-1,nt) = 1.0
-     !if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j+1,nt) = 1.0
+     if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j+1,nt) = 1.0
     enddo
    enddo
 

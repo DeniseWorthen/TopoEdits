@@ -76,6 +76,9 @@ program topoedits
      lonCt(i,j) =     x(i2-1,j2-1)
     !deg
      latCt(i,j) =     y(i2-1,j2-1)
+    !deg
+     lonBu(i,j) =     x(i2,j2)
+     latBu(i,j) =     y(i2,j2)
    enddo
   enddo
 

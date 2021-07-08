@@ -1,0 +1,43 @@
+cancel data/all
+
+!set data mask.mx100.nc
+!define region/i=1:200/j=240:320 ul
+!define region/i=200:360/j=240:320 ur
+!define region/i=1:200/j=1:80 ll
+!define region/i=200:360/j=1:80 lr
+
+!set data mask.mx050.nc
+!define region/i=1:360/j=440:576 ul
+!define region/i=360:720/j=440:576 ur
+!define region/i=1:360/j=1:100 ll
+!define region/i=360:720/j=1:100 lr
+
+
+set data mask.mx025.nc
+define region/i=1:720/j=800:1080 ul
+define region/i=720:1440/j=800:1080 ur
+define region/i=1:720/j=1:220 ll
+define region/i=720:1440/j=1:220 lr
+
+let diff=wet-xwet[k=4]
+let landremove= if diff lt 0 then diff
+let landadd= if diff gt 0 then diff
+
+set region ul
+set wind 1; shade/lev=(0,2,1)/nokey wet
+set wind 2; shade/pal=grey/nolab if wet gt 0 then wet; shade/over/pal=blue/nolab landremove; shade/over/pal=red/nolab landadd
+mess
+
+set region ur
+set wind 1; shade/lev=(0,2,1)/nokey wet
+set wind 2; shade/pal=grey/nolab if wet gt 0 then wet; shade/over/pal=blue/nolab landremove; shade/over/pal=red/nolab landadd
+mess
+
+set region ll
+set wind 1; shade/lev=(0,2,1)/nokey wet
+set wind 2; shade/pal=grey/nolab if wet gt 0 then wet; shade/over/pal=blue/nolab landremove; shade/over/pal=red/nolab landadd
+mess
+
+set region lr
+set wind 1; shade/lev=(0,2,1)/nokey wet
+set wind 2; shade/pal=grey/nolab if wet gt 0 then wet; shade/over/pal=blue/nolab landremove; shade/over/pal=red/nolab landadd
