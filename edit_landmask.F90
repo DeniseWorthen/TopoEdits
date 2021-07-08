@@ -112,4 +112,8 @@ module edit_landmask
 
  end subroutine fixchannels
 
+ subroutine check_result
+
+
+ end subroutine check_result
 end module edit_landmask

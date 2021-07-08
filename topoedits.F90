@@ -18,7 +18,7 @@ program topoedits
   integer :: ii,jj,k,nt
   integer :: cnt
 
-  real(kind=8) :: sum
+  real(kind=8) :: xsum
   real(kind=4), dimension(ni,nj) :: maskdiff
 
 !---------------------------------------------------------------------
@@ -128,12 +128,18 @@ program topoedits
 
    end do
 
+   !?
+   !call check_result
+
 !---------------------------------------------------------------------
 ! adjust bathymetry
 !---------------------------------------------------------------------
 
    xdepth = depth
    maskdiff(:,:) = wet4(:,:) - xwet(:,:,nsteps)
+   xsum = sum(abs(maskdiff))
+   print *,'number of changed points ',xsum,' total points ',ni*nj
+   npoints = int(xsum,4)
 
    ! where land is added, set xdepth to 0.0
    where(maskdiff .gt. 0.0)xdepth = 0.0
@@ -147,8 +153,8 @@ program topoedits
                    ip1 = i+1
       if(i .eq. ni)ip1 = 1
 
-      sum = depth(im1,j) + depth(ip1,j) + depth(i,j-1) + depth(i,j+1)
-      xdepth(i,j) = sum/4.0
+      xsum = depth(im1,j) + depth(ip1,j) + depth(i,j-1) + depth(i,j+1)
+      xdepth(i,j) = xsum/4.0
      end if
     end do
    end do
@@ -158,11 +164,13 @@ program topoedits
 ! land->ocean at run time. see issue #47 on NOAA-EMC/MOM6
 !---------------------------------------------------------------------
 
+    call write_topoedits
+
 !   ii = 88; jj = 132
 !   if(wet4(ii+1,jj+1) .eq. 0.0)wet4(ii+1,jj+1) = 1.0
 
 !---------------------------------------------------------------------
-! write out grid file files
+! write out mask file for checking
 !---------------------------------------------------------------------
 
    call write_mskgrid

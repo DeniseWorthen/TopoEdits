@@ -25,5 +25,7 @@ module param
 
   ! number of adjustment steps
   integer, parameter :: nsteps = 4
+  ! number of altered land points
+  integer :: npoints
 
 end module param
