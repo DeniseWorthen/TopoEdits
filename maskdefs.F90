@@ -64,6 +64,11 @@ module maskdefs
    mskgrid(ii)%var_type  = 'r8'
 
    ii = ii + 1
+   mskgrid(ii)%var_name  = 'modmask'
+   mskgrid(ii)%long_name = 'final modified land mask'
+   mskgrid(ii)%unit_name = 'nd'
+
+   ii = ii + 1
    mskgrid(ii)%var_name  = 'kmtsum'
    mskgrid(ii)%long_name = '4point mask sum'
    mskgrid(ii)%unit_name = 'nd'

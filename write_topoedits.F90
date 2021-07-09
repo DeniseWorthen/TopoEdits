@@ -10,14 +10,16 @@ subroutine write_topoedits
   ! local variables
 
   character(len=256) :: fname_out, fname_in
-  integer :: dimid,i,ii,jj,kk,id,rc, ncid, dim1(1), dim2(2), ni_dim, nj_dim
+  integer :: dimid,i,j,ii,jj,nv,id,rc, ncid, dim1(1), dim2(2), ni_dim, nj_dim
   integer :: nvals, newvals
+  real :: diff
 
-  integer, allocatable, dimension(:) :: orii, orij, newi, newj
-  real(kind=4), allocatable, dimension(:) :: oriz, newz
+  integer, allocatable, dimension(:) :: iedit, jedit, iedit2, jedit2
+  real(kind=4), allocatable, dimension(:) :: zedit, zedit2
 
    fname_in =  trim(dirsrc)//trim(res)//'/'//trim(topoeditfile)
-  fname_out = trim(dirout)//'ufs.ciceBgrid.topoedits_mx'//trim(res)//'.nc'
+  !fname_out = trim(dirout)//'ufs.ciceBgrid.topoedits_mx'//trim(res)//'.nc'
+  fname_out = 'ufs.ciceBgrid.topoedits_mx'//trim(res)//'.nc'
 
 !---------------------------------------------------------------------
 ! read existing topo edits
@@ -32,69 +34,80 @@ subroutine write_topoedits
     rc = nf90_close(ncid)
 
     ! return the existing values
-    allocate(orii(nvals))
-    allocate(orij(nvals))
-    allocate(oriz(nvals))
+    allocate(iedit(nvals))
+    allocate(jedit(nvals))
+    allocate(zedit(nvals))
 
     rc = nf90_open(fname_in, nf90_nowrite, ncid)
-    rc = nf90_inq_varid(ncid, 'iEdit', id)
-    rc = nf90_get_var(ncid, id, orii)
-    rc = nf90_inq_varid(ncid, 'jEdit', id)
-    rc = nf90_get_var(ncid, id, orij)
-    rc = nf90_inq_varid(ncid, 'zEdit', id)
-    rc = nf90_get_var(ncid, id, oriz)
+    rc = nf90_inq_varid(ncid, 'iEdit',    id)
+    rc = nf90_get_var(ncid,        id, iedit)
+    rc = nf90_inq_varid(ncid, 'jEdit',    id)
+    rc = nf90_get_var(ncid,        id, jedit)
+    rc = nf90_inq_varid(ncid, 'zEdit',    id)
+    rc = nf90_get_var(ncid,        id, zedit)
     rc = nf90_close(ncid)
+
+    ! adjust i,j by 1 to account for how MOM6 ingests the edits
+    iedit = iedit+1
+    jedit = jedit+1
   else
     nvals = 0
   endif
 
 !---------------------------------------------------------------------
-! check for any point which goes from land->ocean in original topoedit
-! file at run time and modify mask
-! this mask is written to tripole file used to generated mapped ocean
-! mask, ice mesh and regrid weights
-!
-! should find only for 1deg
-!---------------------------------------------------------------------
-
-  if(nvals .gt. 0)then
-    do kk = 1,nvals
-       ii = orii(kk); jj = orij(kk)
-       if(depth(ii+1,jj+1) .eq. 0.0 .and. oriz(kk) .ne. 0.0)then
-        print '(3i4,3f10.2)',kk,ii,jj,wet4(ii+1,jj+1),depth(ii+1,jj+1),oriz(kk)
-        xwet(ii+1,jj+1,nsteps) = 1.0
-       endif
-    enddo
-   endif
-#ifdef test
-!---------------------------------------------------------------------
 ! allocate space for change land mask
 !---------------------------------------------------------------------
 
   newvals = nvals+npoints
-  print *, 'found ',ii,' open water points at j=1 , newvals = ',newvals
- 
-  allocate(newi(1:newvals))
-  allocate(newj(1:newvals))
-  allocate(newz(1:newvals))
 
-  newi(1:nvals) = orii(1:nvals)
-  newj(1:nvals) = orij(1:nvals)
-  newz(1:nvals) = oriz(1:nvals)
+  allocate(iedit2(1:newvals))
+  allocate(jedit2(1:newvals))
+  allocate(zedit2(1:newvals))
+
+  if(allocated(iedit))iedit2(1:nvals) = iedit(1:nvals)
+  if(allocated(jedit))jedit2(1:nvals) = jedit(1:nvals)
+  if(allocated(zedit))zedit2(1:nvals) = zedit(1:nvals)
 
   ii = nvals
-  do i = 1,ni
-   if(xwet(i,j,nsteps) .eq. 1.0)then
+  do j = 1,nj
+   do i = 1,ni
+    diff = wet4(i,j) - xwet(i,j,nsteps)
+    if(diff .ne. 0.)then
      ii = ii+1
-     newi(ii) = i-1
-     newj(ii) = 1-1
-     newz(ii) = 0.0
-   end if
+     iedit2(ii) = i
+     jedit2(ii) = j
+     zedit2(ii) = xdepth(i,j)
+    end if
+   end do
   end do
 
-  !do i = 1,newvals
-  ! print *,i,newi(i),newj(i),newz(i)
-  !end do
+!---------------------------------------------------------------------
+! change mask consistent w/ topoedits (applied at run time)
+! this mask is written to tripole file and used to generate mapped ocean
+! mask, ice mesh and regrid weights
+!---------------------------------------------------------------------
+
+   modmask(:,:) = xwet(:,:,nsteps)
+   do nv = 1,nvals
+      ii = iedit2(nv); jj = jedit2(nv)
+      if(zedit2(nv) .eq. 0.0)then
+        modmask(ii,jj) = 0.0
+      else
+        modmask(ii,jj) = 1.0
+      endif
+   enddo
+
+!---------------------------------------------------------------------
+! adjust i,j by 1 to account for how MOM6 ingests the edits
+!---------------------------------------------------------------------
+
+  do ii = 1,newvals
+   iedit2(ii) = iedit2(ii)-1
+   jedit2(ii) = jedit2(ii)-1
+  end do
+  do ii = 1,newvals
+   print *,ii,iedit2(ii),jedit2(ii),zedit2(ii)
+  end do
 
 !---------------------------------------------------------------------
 ! create new topoedits file
@@ -116,20 +129,17 @@ subroutine write_topoedits
   rc = nf90_enddef(ncid)
  
   rc = nf90_inq_varid(ncid,     'ni',     id)
-  print *,trim(nf90_strerror(rc))
   rc = nf90_put_var(ncid,         id,     ni)
-  print *,trim(nf90_strerror(rc))
   rc = nf90_inq_varid(ncid,     'nj',     id)
   rc = nf90_put_var(ncid,         id,     nj)
 
   rc = nf90_inq_varid(ncid,  'iEdit',     id)
-  rc = nf90_put_var(ncid,         id,    newi)
+  rc = nf90_put_var(ncid,         id, iedit2)
   rc = nf90_inq_varid(ncid,  'jEdit',     id)
-  rc = nf90_put_var(ncid,         id,    newj)
+  rc = nf90_put_var(ncid,         id, jedit2)
   rc = nf90_inq_varid(ncid,  'zEdit',     id)
-  rc = nf90_put_var(ncid,         id,    newz)
+  rc = nf90_put_var(ncid,         id, zedit2)
 
   rc = nf90_close(ncid)
-#endif
 
 end subroutine write_topoedits

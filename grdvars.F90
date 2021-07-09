@@ -27,4 +27,10 @@ module grdvars
   real(kind=8), dimension(ni,nj) ::  depth   ! default depth
   real(kind=8), dimension(ni,nj) :: xdepth   ! mask modified depth
 
+  ! modified mask; the land mask which will be created at run time
+  ! using the supplied topoedits, which maybe either land->ocean
+  ! or ocean->land
+
+   real(kind=4), dimension(ni,nj) :: modmask
+
 end module grdvars
