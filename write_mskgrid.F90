@@ -12,32 +12,14 @@ subroutine write_mskgrid
 
   character(len=256) :: fname_out, fname_in
   integer :: ii,id,rc, ncid, dim1(1), dim2(2), dim3(3)
-  integer :: xtdim, ytdim, xudim, yudim, kdim
 
-  integer :: i,j
+  integer :: i,j,ndims
+  integer :: idimid, jdimid, kdimid
 
-   real(kind=4), dimension(ni) :: xtpos, xupos
-   real(kind=4), dimension(nj) :: ytpos, yupos
-
-   character(len=2)  :: vtype
-   character(len=12) :: vname
-!--------------------------------------------------------------------
-!c set up integer grid positions of Ct and Bu grids
-!c--------------------------------------------------------------------
-
-    xtpos(1) = 0.5
-    xupos(1) = 1.0
-   do i = 2,ni
-    xtpos(i) = xtpos(i-1) + 1.0
-    xupos(i) = xupos(i-1) + 1.0
-   enddo
-
-    ytpos(1) = 0.5
-    yupos(1) = 1.0
-   do j = 2,nj
-    ytpos(j) = ytpos(j-1) + 1.0
-    yupos(j) = yupos(j-1) + 1.0
-   enddo
+  character(len=2)  :: vtype
+  character(len=12) :: vname
+  character(len=40) :: vlong
+  character(len=12) :: vunit
 
 !---------------------------------------------------------------------
 ! local variables
@@ -52,84 +34,32 @@ subroutine write_mskgrid
   print *, 'writing masks to ',trim(fname_out)
   print *, 'nf90_create = ',trim(nf90_strerror(rc))
 
-  rc = nf90_def_dim(ncid, 'Xt',     ni, xtdim)
-  rc = nf90_def_dim(ncid, 'Yt',     nj, ytdim)
-  rc = nf90_def_dim(ncid, 'Xu',     ni, xudim)
-  rc = nf90_def_dim(ncid, 'Yu',     nj, yudim)
-  rc = nf90_def_dim(ncid, 'nk', nsteps,  kdim)
+  rc = nf90_def_dim(ncid, 'ni',     ni, idimid)
+  rc = nf90_def_dim(ncid, 'nj',     nj, jdimid)
+  rc = nf90_def_dim(ncid, 'nk', nsteps, kdimid)
 
-  dim2(2) = yudim
-  dim2(1) = xudim
-  do ii = 1,2
-   if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
-   print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
-   vtype = trim(mskgrid(ii)%var_type)
+  do ii = 1,nmaskvars
    vname = trim(mskgrid(ii)%var_name)
-   if(vtype .eq. 'r8')rc = nf90_def_var(ncid, vname, nf90_double, dim2, id)
-   if(vtype .eq. 'r4')rc = nf90_def_var(ncid, vname, nf90_float,  dim2, id)
-   if(vtype .eq. 'i4')rc = nf90_def_var(ncid, vname, nf90_int,    dim2, id)
-   rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
-   rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
-   end if
-  enddo
-  
-  dim2(2) = ytdim
-  dim2(1) = xtdim
-  do ii = 3,8
-   if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
-   print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
+   vlong = trim(mskgrid(ii)%long_name)
+   vunit = trim(mskgrid(ii)%unit_name)
    vtype = trim(mskgrid(ii)%var_type)
-   vname = trim(mskgrid(ii)%var_name)
-   if(vtype .eq. 'r8')rc = nf90_def_var(ncid, vname, nf90_double, dim2, id)
-   if(vtype .eq. 'r4')rc = nf90_def_var(ncid, vname, nf90_float,  dim2, id)
-   if(vtype .eq. 'i4')rc = nf90_def_var(ncid, vname, nf90_int,    dim2, id)
-   rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
-   rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
+   ndims = mskgrid(ii)%var_ndims
+   if(ndims .eq. 3)then
+    dim3(:) = (/idimid, jdimid, kdimid/)
+    if(vtype .eq. 'r8')rc = nf90_def_var(ncid, vname, nf90_double, dim3, id)
+    if(vtype .eq. 'r4')rc = nf90_def_var(ncid, vname, nf90_float,  dim3, id)
+    if(vtype .eq. 'i4')rc = nf90_def_var(ncid, vname, nf90_int,    dim3, id)
+   else
+    dim2(:) = (/idimid, jdimid/)
+    if(vtype .eq. 'r8')rc = nf90_def_var(ncid, vname, nf90_double, dim2, id)
+    if(vtype .eq. 'r4')rc = nf90_def_var(ncid, vname, nf90_float,  dim2, id)
+    if(vtype .eq. 'i4')rc = nf90_def_var(ncid, vname, nf90_int,    dim2, id)
    end if
-  enddo
-
-  dim3(3) =  kdim
-  dim3(2) = ytdim
-  dim3(1) = xtdim
-  do ii = 9,nmskvars
-   if(len_trim(mskgrid(ii)%var_name) .gt. 0)then
-   print *, 'write = ',ii,'  '//trim(mskgrid(ii)%var_name)//'  '//trim(mskgrid(ii)%var_type)
-   vtype = trim(mskgrid(ii)%var_type)
-   vname = trim(mskgrid(ii)%var_name)
-   if(vtype .eq. 'r8')rc = nf90_def_var(ncid, vname, nf90_double, dim3, id)
-   if(vtype .eq. 'r4')rc = nf90_def_var(ncid, vname, nf90_float,  dim3, id)
-   if(vtype .eq. 'i4')rc = nf90_def_var(ncid, vname, nf90_int,    dim3, id)
-   rc = nf90_put_att(ncid, id,     'units', trim(mskgrid(ii)%unit_name))
-   rc = nf90_put_att(ncid, id, 'long_name', trim(mskgrid(ii)%long_name))
-   end if
-  enddo
-
-  dim1(1) = xtdim
-  rc = nf90_def_var(ncid,     'Xt', nf90_float, dim1, id)
-  !rc = nf90_put_att(ncid, id, 'axis', 'x')
-  dim1(1) = xudim
-  rc = nf90_def_var(ncid,     'Xu', nf90_float, dim1, id)
-  !rc = nf90_put_att(ncid, id, 'axis', 'x')
-  dim1(1) = ytdim
-  rc = nf90_def_var(ncid,     'Yt', nf90_float, dim1, id)
-  !rc = nf90_put_att(ncid, id, 'axis', 'y')
-  dim1(1) = yudim
-  rc = nf90_def_var(ncid,     'Yu', nf90_float, dim1, id)
-  !rc = nf90_put_att(ncid, id, 'axis', 'y')
-
+    rc = nf90_put_att(ncid, id,     'units', vunit)
+    rc = nf90_put_att(ncid, id, 'long_name', vlong)
+  end do
   rc = nf90_enddef(ncid)
 
-  ! axes
-  rc = nf90_inq_varid(ncid, 'Xt',    id)
-  rc = nf90_put_var(ncid,     id, xtpos)
-  rc = nf90_inq_varid(ncid, 'Xu',    id)
-  rc = nf90_put_var(ncid,     id, xupos)
-  rc = nf90_inq_varid(ncid, 'Yt',    id)
-  rc = nf90_put_var(ncid,     id, ytpos)
-  rc = nf90_inq_varid(ncid, 'Yu',    id)
-  rc = nf90_put_var(ncid,     id, yupos)
-
-  ! coords
   rc = nf90_inq_varid(ncid, 'lonCt',      id)
   rc = nf90_put_var(ncid,        id,   lonCt)
 

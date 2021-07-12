@@ -1,16 +1,16 @@
 cancel data/all
 
-set data mask.mx100.nc
-define region/i=1:200/j=240:320 ul
-define region/i=200:360/j=240:320 ur
-define region/i=1:200/j=1:80 ll
-define region/i=200:360/j=1:80 lr
+!set data mask.mx100.nc
+!define region/i=1:200/j=240:320 ul
+!define region/i=200:360/j=240:320 ur
+!define region/i=1:200/j=1:80 ll
+!define region/i=200:360/j=1:80 lr
 
-!set data mask.mx050.nc
-!define region/i=1:360/j=440:576 ul
-!define region/i=360:720/j=440:576 ur
-!define region/i=1:360/j=1:100 ll
-!define region/i=360:720/j=1:100 lr
+set data mask.mx050.nc
+define region/i=1:360/j=440:576 ul
+define region/i=360:720/j=440:576 ur
+define region/i=1:360/j=1:100 ll
+define region/i=360:720/j=1:100 lr
 
 !set data mask.mx025.nc
 !define region/i=1:720/j=800:1080 ul

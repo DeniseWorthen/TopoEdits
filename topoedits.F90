@@ -132,6 +132,17 @@ program topoedits
    !call check_result
 
 !---------------------------------------------------------------------
+! hand edits
+!---------------------------------------------------------------------
+
+  !if(trim(res) .eq. '100')then
+   ! this actually opens a channel which is closed in the original mask
+   !i = 219; j = 289; xwet(i,j,nsteps) = 1.0
+   !i = 219; j = 290; xwet(i,j,nsteps) = 1.0
+   !i = 220; j = 290; xwet(i,j,nsteps) = 1.0
+  !endif
+
+!---------------------------------------------------------------------
 ! adjust bathymetry
 !---------------------------------------------------------------------
 
