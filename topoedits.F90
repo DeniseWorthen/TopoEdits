@@ -50,6 +50,15 @@ program topoedits
    enddo
   enddo
 
+  do j = 1,nj-1
+   do i = 1,ni-1
+    dum(i,j)=wet4(i,j)*wet4(i+1,j)
+    dvm(i,j)=wet4(i,j)*wet4(i,j+1)
+   enddo
+  enddo
+  dum(:,1) = dum(:,2)
+  dvm(:,1) = dvm(:,2)
+
 !---------------------------------------------------------------------
 ! read the bathymetry
 !---------------------------------------------------------------------
@@ -105,7 +114,7 @@ program topoedits
 !---------------------------------------------------------------------
 
    kmtsum = 0.0
-    kmtii = 0.0; kmtjj = 0.0
+    kmtii = 0.0; kmtjj = 0.0; kmtij = 0.0
 
     xwet(:,:,1) =  wet4(:,:)
     ! set j=1 to land in case it isn't
@@ -130,7 +139,7 @@ program topoedits
 
    !?
    !call check_result
-
+#ifdef test
 !---------------------------------------------------------------------
 ! hand edits
 !---------------------------------------------------------------------
@@ -184,6 +193,7 @@ program topoedits
 ! write out mask file for checking
 !---------------------------------------------------------------------
 
+#endif
    call write_mskgrid
 
 end program topoedits

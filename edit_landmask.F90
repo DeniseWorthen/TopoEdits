@@ -41,7 +41,6 @@ module edit_landmask
      enddo
     enddo
     print *,'iteration ',nt,' number of single points eliminated',cnt
-
  end subroutine singlepoints
 
  subroutine fixchannels(nt)
@@ -61,13 +60,20 @@ module edit_landmask
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     if(xwet(i,j+1,nt) .eq. 1.0 .or. xwet(i,j-1,nt) .eq. 1.0)then   !n/s channel
-      if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)kmtii(i,j,nt) = 1.0
+     if(xwet(i,j+1,nt) .eq. 1.0 .and. xwet(i,j-1,nt) .eq. 1.0)then   !n/s channel
+      if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)then
+        kmtii(i,j,nt) = 1.0
+        print *,'iteration ',nt,' im1,ip1 pinch at ',i,j
+      end if
      end if
 
-     if(xwet(im1,j,nt) .eq. 1.0 .or. xwet(ip1,j,nt) .eq. 1.0)then   !e/w channel
-      if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)kmtjj(i,j,nt) = 1.0
+     if(xwet(im1,j,nt) .eq. 1.0 .and. xwet(ip1,j,nt) .eq. 1.0)then   !e/w channel
+      if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)then
+       kmtjj(i,j,nt) = 1.0
+       print *,'iteration ',nt,' jm1,jp1 pinch at ',i,j
+      end if
      end if
+
     end if
    end do
   end do
@@ -80,19 +86,19 @@ module edit_landmask
    do j = 2,nj-1
     do i = 2,ni-1
      if (kmtii(i,j,nt) .eq. 1.0) xwet(i-1,j,nt) = 1.0
-     if (kmtii(i,j,nt) .eq. 1.0) xwet(i+1,j,nt) = 1.0
+     !if (kmtii(i,j,nt) .eq. 1.0) xwet(i+1,j,nt) = 1.0
     enddo
    enddo
 
    do j = 2,nj-1
     do i = 2,ni-1
      if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j-1,nt) = 1.0
-     if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j+1,nt) = 1.0
+     !if (kmtjj(i,j,nt) .eq. 1.0) xwet(i,j+1,nt) = 1.0
     enddo
    enddo
-
+#ifdef test
 !---------------------------------------------------------------------
-! report remaining pinch points
+!
 !---------------------------------------------------------------------
 
    do j = 2,nj-1
@@ -104,11 +110,16 @@ module edit_landmask
                   ip1 = i+1
      if(i .eq. ni)ip1 = 1
 
-     if(xwet(im1,j,nt) .eq. 0.0 .and. xwet(ip1,j,nt) .eq. 0.0)print *,'iteration ',nt,' im1,ip1 pinch at ',i,j
-     if(xwet(i,j-1,nt) .eq. 0.0 .and. xwet(i,j+1,nt) .eq. 0.0)print *,'iteration ',nt,' jm1,jp1 pinch at ',i,j
+     if(xwet(i,j,nt) .eq. 1.0)then
+       if(xwet(im1,j+1,nt) .eq. 0.0 .and. xwet(ip1,j-1,nt) .eq. 0.0)kmtij(i,j,nt) = 1.0
+       if(xwet(im1,j-1,nt) .eq. 0.0 .and. xwet(ip1,j+1,nt) .eq. 0.0)kmtij(i,j,nt) = 1.0
+     endif
+     if(kmtij(i,j,nt) .eq. 1.0)print *,'iteration ',nt,' kiss pinch at ',i,j
     end if
    end do
   end do
+#endif
+  print *
 
  end subroutine fixchannels
 

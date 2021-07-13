@@ -75,6 +75,12 @@ subroutine write_mskgrid
   rc = nf90_inq_varid(ncid,   'wet',      id)
   rc = nf90_put_var(ncid,        id,    wet4)
 
+  rc = nf90_inq_varid(ncid,   'dum',      id)
+  rc = nf90_put_var(ncid,        id,     dum)
+
+  rc = nf90_inq_varid(ncid,   'dvm',      id)
+  rc = nf90_put_var(ncid,        id,     dvm)
+
   rc = nf90_inq_varid(ncid, 'depth',      id)
   rc = nf90_put_var(ncid,        id,   depth)
 
@@ -93,6 +99,9 @@ subroutine write_mskgrid
 
   rc = nf90_inq_varid(ncid,  'kmtjj',     id)
   rc = nf90_put_var(ncid,         id,  kmtjj)
+
+  rc = nf90_inq_varid(ncid,  'kmtij',     id)
+  rc = nf90_put_var(ncid,         id,  kmtij)
 
   rc = nf90_inq_varid(ncid,   'xwet',     id)
   rc = nf90_put_var(ncid,         id,   xwet)

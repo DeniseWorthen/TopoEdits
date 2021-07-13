@@ -11,11 +11,14 @@ module grdvars
      real(kind=4), dimension(ni,nj) :: wet4
      real(kind=8), dimension(ni,nj) :: wet8
 
+     real(kind=4), dimension(ni,nj) :: dum, dvm
+
   ! intermediate masks
      real(kind=4), dimension(ni,nj,nsteps) :: kmtsum
      real(kind=4), dimension(ni,nj,nsteps) :: xwet
      real(kind=4), dimension(ni,nj,nsteps) :: kmtii
      real(kind=4), dimension(ni,nj,nsteps) :: kmtjj
+     real(kind=4), dimension(ni,nj,nsteps) :: kmtij
   ! cice 'uvm' mask
      real(kind=4), dimension(ni,nj,nsteps) :: uvm
 

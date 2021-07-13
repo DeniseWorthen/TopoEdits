@@ -54,6 +54,16 @@ module maskdefs
    mskgrid(ii)%unit_name = 'nd'
 
    ii = ii + 1
+   mskgrid(ii)%var_name  = 'dum'
+   mskgrid(ii)%long_name = 'land mask Cu grid'
+   mskgrid(ii)%unit_name = 'nd'
+
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'dvm'
+   mskgrid(ii)%long_name = 'land mask Cv grid'
+   mskgrid(ii)%unit_name = 'nd'
+
+   ii = ii + 1
    mskgrid(ii)%var_name  = 'depth'
    mskgrid(ii)%long_name = 'ocean bathymetry'
    mskgrid(ii)%unit_name = 'm'
@@ -86,6 +96,12 @@ module maskdefs
    ii = ii + 1
    mskgrid(ii)%var_name  = 'kmtjj'
    mskgrid(ii)%long_name = 'pinch j'
+   mskgrid(ii)%unit_name = 'nd'
+   mskgrid(ii)%var_ndims = 3
+
+   ii = ii + 1
+   mskgrid(ii)%var_name  = 'kmtij'
+   mskgrid(ii)%long_name = 'kiss pinch'
    mskgrid(ii)%unit_name = 'nd'
    mskgrid(ii)%var_ndims = 3
 
